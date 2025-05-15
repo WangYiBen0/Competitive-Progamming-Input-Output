@@ -1,4 +1,4 @@
-// LANGUAGE: required C++11 for <type_traits>, auto, range-based for loop
+// LANGUAGE: required C++11 for <type_traits>, auto, range-based for loop, variable template parameters, etc.
 #include <cstdio>
 #include <cctype>
 #include <type_traits>
@@ -38,8 +38,7 @@ namespace IO
         ~IO() { flush_output(); }
     } iomanager;
     inline char getchar() { return iomanager.getchar(); }
-    inline void putchar(const char &c) { iomanager.putchar(c); }
-    inline void putchar(const char &&c) { iomanager.putchar(c); }
+    inline void putchar(char c) { iomanager.putchar(c); }
 #endif
 
     template <typename _Tint, typename = typename std::enable_if<std::is_integral<_Tint>::value>>
@@ -72,6 +71,16 @@ namespace IO
         return x;
     }
 
+    /**
+     * @warning no check for Array-Index-Out-of-Bounds
+     */
+    inline void read(char *s)
+    {
+        while (*s = (char)getchar(), !std::isgraph(*s))
+            ;
+        *s = '\0';
+    }
+
     template <typename _Tp, typename... _Args>
     inline _Tp read(_Tp &x, _Args &...args) { return read(x), read(args...); }
 
@@ -85,19 +94,20 @@ namespace IO
         char buf[128];
         int ptr = 0;
         while (x)
-            buf[++ptr] = char(x % 10 + '0'), x /= 10;
-        for (int i = ptr; i; --i)
-            putchar(buf[i]);
+            buf[ptr++] = char(x % 10 + '0'), x /= 10;
+        while (ptr)
+            putchar(buf[--ptr]);
     }
 
-    inline void write(const char &x) { putchar(x); }
-    inline void write(const char &&x) { putchar(x); }
+    inline void write(char x) { putchar(x); }
 
     inline void write(const std::string &x)
     {
         for (const char &c : x)
             putchar(c);
     }
+
+    inline void write(const char *x) { while (*x) putchar(*x++); }
 
     inline void writeln() { putchar('\n'); }
     template <typename _Tp, typename... _Args>
